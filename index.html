@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TOKEN MEMBER VIP CIMANGCU</title>
+<style>
+:root{
+    --bg:#f5f5f5; --card:#ffffff; --text:#111; --border:#cccccc; --primary:#000;
+}
+body.dark{
+    --bg:#0a0a0a; --card:#1a1a1a; --text:#eeeeee; --border:#444; --primary:#ffffff;
+}
+body{margin:0;background:var(--bg);font-family:Arial;color:var(--text);transition:0.3s;}
+header{background:var(--primary);color:var(--bg);padding:15px;text-align:center;font-size:22px;font-weight:bold;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:9999;}
+.card{background:var(--card);margin:15px;padding:15px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.15);border:1px solid var(--border);}
+input,select{width:100%;padding:10px;margin:8px 0;box-sizing:border-box;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);}
+button{width:auto;padding:10px 14px;margin:4px 2px;background:var(--primary);color:var(--bg);border:none;border-radius:8px;font-size:14px;font-weight:bold;cursor:pointer;}
+button:hover{opacity:0.85;} button:disabled{opacity:0.5;cursor:not-allowed;}
+button.secondary{background:#666; color:#fff;}
+button.small{padding:6px 10px;font-size:12px;}
+button.copy{width:40px;padding:6px;background:#555; color:#fff;}
+button.warning{background:#333;}
+table{width:100%;border-collapse:collapse;margin-top:10px;}
+th,td{border:1px solid var(--border);padding:6px;}
+th{background:var(--primary);color:var(--bg);font-size:14px;}
+td input{margin:0;padding:6px;font-size:13px;background:var(--bg);color:var(--text);}
+.delete{background:#000;}.add{background:#000;}.save{background:#000;}
+.status{margin-top:10px;font-weight:bold;}
+.status.success{color:#000;}.status.error{color:#cc0000;}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;}
+.stat-box{background:var(--bg);padding:10px;border-radius:8px;border-left:4px solid var(--primary);border:1px solid var(--border);}
+.stat-box h4{margin:0;font-size:12px;color:var(--text);opacity:0.7;}
+.stat-box p{margin:5px 0 0;font-size:20px;font-weight:bold;color:var(--primary);}
+.expiring{background:#ffffcc!important;}.expired{background:#ffcccc!important;}
+body.dark tr.expiring{background:#333300!important;}
+body.dark tr.expired{background:#330000!important;}
+.save{position:sticky;bottom:10px;z-index:999;box-shadow:0 -2px 10px rgba(0,0,0,.1);}
+#progress{height:4px;background:var(--primary);width:0%;transition:width 0.3s;position:fixed;top:0;left:0;z-index:99999;}
+#darkToggle{width:45px;height:45px;padding:0;border-radius:50%;font-size:20px;background:var(--bg); color:var(--primary); border:1px solid var(--border);}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+.filter-bar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+.filter-bar button.active{background:#000; color:#fff;}
+.pagination{display:flex;justify-content:center;gap:8px;margin-top:10px;align-items:center;}
+.input-group{display:flex;gap:4px;align-items:center;}
+.input-group button{padding:10px;width:45px;}
+
+.mode-switcher{display:flex;gap:8px;margin-bottom:15px;padding:4px;background:var(--bg);border-radius:8px;border:1px solid var(--border);}
+.mode-switcher button{flex:1;margin:0;padding:8px;border-radius:6px;background:transparent;color:var(--text);font-weight:normal;}
+.mode-switcher button.active{background:var(--primary);color:var(--bg);font-weight:bold;}
+
+.allowed-editor .id-row{display:flex;gap:6px;margin:6px 0;align-items:center;}
+.allowed-editor .id-row input{flex:1;margin:0;}
+.allowed-editor .id-row button{width:45px;padding:6px;background:#cc0000;color:#fff;}
+.allowed-editor .id-row button:hover{background:#ff0000;}
+.global-password{margin-bottom:15px;}
+.global-password label{font-weight:bold;font-size:14px;}
+
+.section{display:none;}
+.section.active{display:block;}
+
+.info-badge{background:var(--bg);padding:8px 12px;border-radius:6px;font-size:13px;border-left:3px solid var(--primary);margin-bottom:10px;}
+</style>
+</head>
+
+<body>
+
+<header>
+TOKEN MEMBER VIP CIMANGCU
+<button id="darkToggle" onclick="toggleDark()">🌙</button>
+</header>
+
+<div id="progress"></div>
+
+<div class="card">
+<label>GitHub Token Fine-Grained</label>
+<div class="input-group">
+<input id="token" type="password" placeholder="github_pat_xxxxxxxxxxxx">
+<button type="button" onclick="toggleToken()">👁</button>
+</div>
+<label>Repository</label>
+<input id="repo" value="yuwanaroy-cpu/Tempkey">
+<label>File</label>
+<input id="path" value="Tempkey.json">
+<button id="btnLoad" class="secondary" onclick="loadJson()">LOAD DARI GITHUB</button>
+<div class="status" id="status">Belum memuat data</div>
+</div>
+
+<div class="card">
+<div class="mode-switcher">
+<button id="modeMember" class="active" onclick="setMode('member')">👥 Member Array</button>
+<button id="modeAllowed" onclick="setMode('allowed')">🔑 Allowed IDs</button>
+</div>
+<div class="info-badge" id="modeInfo">
+Mode <b>Member Array</b> — Mengelola data member dengan ID, Username, Password, Expired, dan Offline.
+</div>
+</div>
+
+<div id="sectionMember" class="section active">
+<div class="card">
+<input id="search" type="text" placeholder="Cari ID, Username, Password, Expired, online/offline..." onkeyup="refresh()">
+
+<div class="filter-bar">
+<button onclick="setFilter('all',event)" class="active">Semua</button>
+<button onclick="setFilter('active',event)">🟢 Aktif</button>
+<button onclick="setFilter('expiring',event)">🟡 Exp ≤7 Hari</button>
+<button onclick="setFilter('expired',event)">🔴 Expired</button>
+<button onclick="setFilter('offline',event)">⚪ Offline</button>
+</div>
+
+<div class="stats">
+  <div class="stat-box"><h4>Total Member</h4><p id="stat-total">0</p></div>
+  <div class="stat-box"><h4>🟢 Aktif</h4><p id="stat-active">0</p></div>
+  <div class="stat-box"><h4>🟡 Exp ≤7 Hari</h4><p id="stat-expiring">0</p></div>
+  <div class="stat-box"><h4>🔴 Expired</h4><p id="stat-expired">0</p></div>
+  <div class="stat-box"><h4>⚪ Allow Offline</h4><p id="stat-off">0</p></div>
+</div>
+
+<div class="toolbar">
+<button class="secondary" onclick="sortBy('username')">A-Z Username</button>
+<button class="secondary" onclick="sortBy('expiresAt')">Urut Expired</button>
+<button class="secondary" onclick="sortBy('id')">Urut ID</button>
+<button class="secondary" id="undoBtn" onclick="undo()" disabled>↩️ Undo</button>
+<button class="secondary" id="redoBtn" onclick="redo()" disabled>↪️ Redo</button>
+</div>
+
+<button class="add" onclick="addRow()">+ Tambah Member</button>
+<button id="btnImport" class="secondary" onclick="document.getElementById('importFile').click()">📤 Import JSON</button>
+<button class="secondary" onclick="exportJSON()">📥 Export JSON</button>
+<button class="secondary" onclick="copyAllData()">📋 Copy Semua Data</button>
+<input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
+<button class="secondary" onclick="validateJson()">✅ Cek JSON</button>
+<button class="delete" onclick="hapusSemuaExpired()">🔥 Hapus Semua Expired</button>
+<button class="save" onclick="saveJson()">💾 SIMPAN KE GITHUB</button>
+
+<table>
+<thead><tr><th>ID</th><th>User</th><th>Password</th><th>Expired + Tambah</th><th>Offline</th><th>Hapus</th></tr></thead>
+<tbody id="tbody"></tbody>
+</table>
+
+<div class="pagination" id="pagination"></div>
+</div>
+</div>
+
+<div id="sectionAllowed" class="section">
+<div class="card">
+<div class="global-password">
+<label>Password Global</label>
+<div class="input-group">
+<input id="globalPassword" type="password" placeholder="Password untuk semua member..." oninput="markDirty()">
+<button type="button" onclick="toggleGlobalPass()">👁</button>
+</div>
+</div>
+
+<div class="toolbar">
+<button class="add" onclick="addAllowedId()">+ Tambah ID</button>
+<button class="secondary" onclick="sortAllowedIds()">A-Z Sort</button>
+<button class="secondary" onclick="removeAllAllowedIds()">🧹 Hapus Semua</button>
+<button class="secondary" onclick="copyAllowedIds()">📋 Copy IDs</button>
+<button class="secondary" onclick="exportAllowedJSON()">📥 Export</button>
+<button class="secondary" onclick="validateJson()">✅ Cek JSON</button>
+<button class="save" onclick="saveJson()">💾 SIMPAN KE GITHUB</button>
+</div>
+
+<div class="allowed-editor" id="allowedList"></div>
+
+<div style="margin-top:15px;">
+<input id="newAllowedId" placeholder="ID baru..." style="width:calc(100% - 120px);display:inline-block;">
+<button onclick="addAllowedIdFromInput()" style="width:110px;">Tambah</button>
+</div>
+
+<div style="margin-top:10px;font-size:13px;color:#666;">
+Total: <span id="allowedCount" style="font-weight:bold;color:var(--text);">0</span> ID terdaftar
+</div>
+</div>
+</div>
+
+<script>
+let json = [];
+let allowedIds = [];
+let globalPassword = "cimangcuvip";
+let sha = "";
+let historyStack = [];
+let historyIndex = -1;
+let dirty = false;
+let isSaving = false;
+let saveRetry = 0;
+let historyTimeout = null;
+let currentFilter = 'all';
+let currentPage = 1;
+const pageSize = 50;
+let currentMode = 'member';
+let originalFormat = 'auto';
+
+const status = document.getElementById("status");
+const progress = document.getElementById("progress");
+
+function getFullState() {
+    return {
+        members: json,
+        allowed_ids: allowedIds,
+        password: document.getElementById('globalPassword').value || globalPassword
+    };
+}
+
+function setFullState(state) {
+    json = state.members || [];
+    allowedIds = state.allowed_ids || [];
+    globalPassword = state.password || "cimangcuvip";
+    document.getElementById('globalPassword').value = globalPassword;
+}
+
+function setMode(mode) {
+    currentMode = mode;
+    document.querySelectorAll('.mode-switcher button').forEach(b => b.classList.remove('active'));
+    document.getElementById('mode' + (mode === 'member' ? 'Member' : 'Allowed')).classList.add('active');
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById('section' + (mode === 'member' ? 'Member' : 'Allowed')).classList.add('active');
+    const info = document.getElementById('modeInfo');
+    if (mode === 'member') {
+        info.innerHTML = 'Mode <b>Member Array</b> — Mengelola data member dengan ID, Username, Password, Expired, dan Offline.';
+    } else {
+        info.innerHTML = 'Mode <b>Allowed IDs</b> — Mengelola daftar ID yang diizinkan dengan password global.';
+    }
+}
+
+function markDirty() {
+    dirty = true;
+    debounceHistory();
+    autoBackup();
+}
+function debounceHistory() {
+    clearTimeout(historyTimeout);
+    historyTimeout = setTimeout(pushHistory, 800);
+}
+function pushHistory() {
+    let state = JSON.stringify(getFullState());
+    if (historyStack[historyIndex] === state) return;
+    historyStack = historyStack.slice(0, historyIndex + 1);
+    historyStack.push(state);
+    if (historyStack.length > 100) historyStack.shift();
+    historyIndex = historyStack.length - 1;
+    updateUndoRedoBtn();
+}
+function updateUndoRedoBtn() {
+    document.getElementById("undoBtn").disabled = historyIndex <= 0;
+    document.getElementById("redoBtn").disabled = historyIndex >= historyStack.length - 1;
+}
+function undo() {
+    if (historyIndex > 0) {
+        historyIndex--;
+        let state = JSON.parse(historyStack[historyIndex]);
+        setFullState(state);
+        if (currentMode === 'member') {
+            refresh();
+        } else {
+            renderAllowedIds();
+        }
+        dirty = true;
+    }
+}
+function redo() {
+    if (historyIndex < historyStack.length - 1) {
+        historyIndex++;
+        let state = JSON.parse(historyStack[historyIndex]);
+        setFullState(state);
+        if (currentMode === 'member') {
+            refresh();
+        } else {
+            renderAllowedIds();
+        }
+        dirty = true;
+    }
+}
+
+function toggleDark() {
+    document.body.classList.toggle("dark");
+    localStorage.setItem("darkmode", document.body.classList.contains("dark") ? "1" : "0");
+    document.getElementById("darkToggle").innerText = document.body.classList.contains("dark") ? "☀️" : "🌙";
+}
+function toggleToken() {
+    const el = document.getElementById("token");
+    el.type = el.type === "password" ? "text" : "password";
+}
+function toggleGlobalPass() {
+    const el = document.getElementById("globalPassword");
+    el.type = el.type === "password" ? "text" : "password";
+}
+function setProgress(p) { progress.style.width = p + "%"; }
+function setStatus(msg, type = "") { status.innerHTML = msg; status.className = "status " + type; }
+function setButtonsDisabled(state) {
+    document.querySelectorAll(".save,.add,.delete").forEach(b => b.disabled = state);
+    document.getElementById("btnLoad").disabled = state;
+    document.getElementById("btnImport").disabled = state;
+}
+
+function base64ToString(b64) {
+    const clean = b64.replace(/\r?\n/g, "");
+    const bytes = Uint8Array.from(atob(clean), c => c.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
+}
+function stringToBase64(str) {
+    const bytes = new TextEncoder().encode(str);
+    let binary = "";
+    bytes.forEach(b => binary += String.fromCharCode(b));
+    return btoa(binary);
+}
+
+async function refreshSHA() {
+    let token = document.getElementById("token").value;
+    let repo = document.getElementById("repo").value;
+    let path = document.getElementById("path").value;
+    let r = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, { headers: { Authorization: `Bearer ${token}` } });
+    if (r.ok) {
+        let result = await r.json();
+        sha = result?.sha || "";
+        return true;
+    }
+    setStatus(`Gagal ambil SHA: HTTP ${r.status}`, "error");
+    return false;
+}
+
+async function loadJson() {
+    let token = document.getElementById("token").value;
+    let repo = document.getElementById("repo").value;
+    let path = document.getElementById("path").value;
+    setButtonsDisabled(true);
+    setProgress(10);
+    setStatus("Mengambil data...", "");
+    try {
+        let r = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+            headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" }
+        });
+        setProgress(60);
+        if (r.status == 401) { setStatus("Token GitHub salah / tidak punya akses", "error"); setProgress(0); setButtonsDisabled(false); return; }
+        if (r.status == 404) { setStatus("Repository atau file tidak ditemukan", "error"); setProgress(0); setButtonsDisabled(false); return; }
+        if (r.status == 403) { setStatus("GitHub API Rate Limit. Coba lagi 1 menit", "error"); setProgress(0); setButtonsDisabled(false); return; }
+        if (!r.ok) { setStatus("Gagal (HTTP " + r.status + ")", "error"); setProgress(0); setButtonsDisabled(false); return; }
+
+        let data = await r.json();
+        sha = data?.sha || "";
+        let text = base64ToString(data.content);
+        let parsed = JSON.parse(text);
+
+        if (Array.isArray(parsed)) {
+            originalFormat = 'array';
+            json = parsed;
+            allowedIds = [];
+            globalPassword = "cimangcuvip";
+            setMode('member');
+        } else if (parsed && typeof parsed === 'object') {
+            originalFormat = 'object';
+            json = [];
+            allowedIds = Array.isArray(parsed.allowed_ids) ? parsed.allowed_ids : [];
+            globalPassword = parsed.password || "cimangcuvip";
+            setMode('allowed');
+            document.getElementById('globalPassword').value = globalPassword;
+            renderAllowedIds();
+        } else {
+            throw new Error("Format JSON tidak dikenali. Harus Array [] atau Object {password, allowed_ids}");
+        }
+
+        localStorage.removeItem("tempkey_backup");
+        setProgress(90);
+        if (currentMode === 'member') {
+            pushHistory();
+            refresh();
+        }
+        dirty = false;
+        setProgress(100);
+        setTimeout(() => setProgress(0), 500);
+        setStatus(`✅ Berhasil memuat ${currentMode === 'member' ? json.length + ' member' : allowedIds.length + ' ID'}`, "success");
+        localStorage.setItem("github_token", token);
+    } catch (e) {
+        setStatus("❌ JSON tidak valid: " + e.message, "error");
+        setProgress(0);
+    }
+    setButtonsDisabled(false);
+}
+
+function isValidGitHubToken(token) {
+    return /^gh[pousr]_[A-Za-z0-9]{36,}$/.test(token) || /^github_pat_[A-Za-z0-9_]{22,}$/.test(token);
+}
+
+async function saveJson() {
+    if (isSaving) return;
+    if (!sha) { setStatus("Load dulu", "error"); return; }
+    let token = document.getElementById("token").value;
+    let repo = document.getElementById("repo").value;
+    let path = document.getElementById("path").value;
+    if (token == "") { setStatus("Token kosong", "error"); return; }
+    if (!isValidGitHubToken(token)) {
+        setStatus("Token GitHub tidak valid. Format: ghp_xxx, github_pat_xxx, ghs_xxx, gho_xxx", "error");
+        return;
+    }
+
+    if (!isSaving) { saveRetry = 0; }
+    isSaving = true;
+    setButtonsDisabled(true);
+    document.querySelector(".save").disabled = true;
+    setProgress(10);
+    setStatus("Refresh SHA...", "");
+
+    let shaOk = await refreshSHA();
+    if (!shaOk && !sha) {
+        setStatus("Tidak bisa mendapatkan SHA. Cek internet", "error");
+        setButtonsDisabled(false);
+        document.querySelector(".save").disabled = false;
+        isSaving = false;
+        return;
+    }
+
+    setProgress(40);
+    setStatus("Menyimpan ke GitHub...", "");
+
+    let payload;
+    if (currentMode === 'member') {
+        // Cek ID kosong saja, duplikat diperbolehkan
+        for (const m of json) {
+            const id = (m.id || "").trim();
+            if (!id) {
+                setStatus("Masih ada ID kosong.", "error");
+                setButtonsDisabled(false);
+                document.querySelector(".save").disabled = false;
+                isSaving = false;
+                return;
+            }
+        }
+        payload = json;
+    } else {
+        allowedIds = [...new Set(
+            allowedIds
+                .map(x => x.trim())
+                .filter(x => x)
+        )];
+        payload = {
+            password: document.getElementById('globalPassword').value || globalPassword,
+            allowed_ids: allowedIds
+        };
+    }
+
+    let text = JSON.stringify(payload, null, 2);
+    let content = stringToBase64(text);
+    let body = { message: "Update " + path, content: content, sha: sha };
+    setProgress(70);
+    try {
+        let r = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
+            method: "PUT",
+            headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+        });
+        setProgress(90);
+        if (r.status == 409) {
+            if (saveRetry < 1) {
+                saveRetry++;
+                setStatus("Konflik. Mencoba refresh SHA...", "error");
+                await refreshSHA();
+                isSaving = false;
+                return saveJson();
+            } else {
+                setStatus("Konflik. Silakan Load ulang.", "error");
+                saveRetry = 0;
+            }
+        } else if (r.status == 403) {
+            setStatus("❌ GitHub API Rate Limit. Tunggu 1 menit", "error");
+            saveRetry = 0;
+        } else if (r.ok) {
+            let result = await r.json();
+            sha = result?.content?.sha || "";
+            setStatus("✅ Tersimpan", "success");
+            localStorage.setItem("github_token", token);
+            localStorage.removeItem("tempkey_backup");
+            dirty = false;
+            saveRetry = 0;
+            pushHistory();
+        } else {
+            setStatus(`❌ Gagal: HTTP ${r.status}`, "error");
+            saveRetry = 0;
+        }
+        setProgress(100);
+        setTimeout(() => setProgress(0), 500);
+    } catch (e) {
+        setStatus("❌ Error: " + e.message, "error");
+        setProgress(0);
+        saveRetry = 0;
+    }
+    setButtonsDisabled(false);
+    document.querySelector(".save").disabled = false;
+    isSaving = false;
+}
+
+function getFilteredData() {
+    let k = document.getElementById("search").value.toLowerCase();
+    let today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return json.map((data, index) => ({ index, data }))
+        .filter(item => {
+            let m = item.data;
+            let txt = [
+                m.id || "",
+                m.username || "",
+                m.password || "",
+                m.expiresAt || "",
+                m.allowOffline ? "offline" : "online",
+                JSON.stringify(m).toLowerCase()
+            ].join(" ");
+            if (!txt.includes(k)) return false;
+
+            let expDate = m.expiresAt ? new Date(m.expiresAt + "T00:00:00") : null;
+            let diffDays = expDate ? Math.ceil((expDate - today) / (1000 * 60 * 60 * 24)) : 999;
+            if (currentFilter === 'active') return diffDays > 7;
+            if (currentFilter === 'expiring') return diffDays >= 0 && diffDays <= 7;
+            if (currentFilter === 'expired') return diffDays < 0;
+            if (currentFilter === 'offline') return m.allowOffline;
+            return true;
+        });
+}
+
+function setFilter(f, e) {
+    currentFilter = f;
+    currentPage = 1;
+    document.querySelectorAll(".filter-bar button").forEach(b => b.classList.remove("active"));
+    e.currentTarget.classList.add("active");
+    refresh();
+}
+
+function refresh() {
+    let filtered = getFilteredData();
+    let tb = document.getElementById("tbody");
+    tb.innerHTML = "";
+    let today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    let start = (currentPage - 1) * pageSize;
+    let pageData = filtered.slice(start, start + pageSize);
+    renderPagination(filtered.length);
+
+    pageData.forEach((item) => {
+        let realIndex = item.index;
+        let m = item.data;
+        let rowClass = "";
+        if (m.expiresAt) {
+            let expDate = new Date(m.expiresAt + "T00:00:00");
+            let diffDays = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+            if (diffDays < 0) rowClass = "expired"; else if (diffDays <= 7) rowClass = "expiring";
+        }
+
+        let tr = document.createElement("tr");
+        tr.className = rowClass;
+        tr.dataset.index = realIndex;
+
+        let td1 = document.createElement("td");
+        td1.style.display = "flex";
+        td1.style.gap = "4px";
+        let inId = document.createElement("input");
+        inId.value = m.id || "";
+        let btnCopy = document.createElement("button");
+        btnCopy.className = "copy";
+        btnCopy.innerText = "📋";
+        btnCopy.onclick = function() { copyText(m.id || ""); };
+        inId.oninput = () => { json[realIndex].id = inId.value.trim(); markDirty(); };
+        td1.append(inId, btnCopy);
+
+        let td2 = document.createElement("td");
+        let inUser = document.createElement("input");
+        inUser.value = m.username || "";
+        inUser.oninput = () => { json[realIndex].username = inUser.value; markDirty(); };
+        td2.append(inUser);
+
+        let td3 = document.createElement("td");
+        td3.style.display = "flex";
+        td3.style.gap = "4px";
+        let inPass = document.createElement("input");
+        inPass.type = "password";
+        inPass.id = "pass-" + realIndex;
+        inPass.value = m.password || "";
+        inPass.oninput = () => { json[realIndex].password = inPass.value; markDirty(); };
+        let btnEye = document.createElement("button");
+        btnEye.style.width = "45px";
+        btnEye.style.padding = "0";
+        btnEye.innerText = "👁";
+        btnEye.onclick = () => togglePass(realIndex);
+        td3.append(inPass, btnEye);
+
+        let td4 = document.createElement("td");
+        td4.style.display = "flex";
+        td4.style.gap = "4px";
+        let inDate = document.createElement("input");
+        inDate.type = "date";
+        inDate.value = m.expiresAt || "";
+        inDate.oninput = () => { json[realIndex].expiresAt = inDate.value; markDirty(); };
+        let btn30 = document.createElement("button");
+        btn30.className = "small";
+        btn30.innerText = "+30";
+        btn30.onclick = () => addDays(realIndex, 30);
+        let btn90 = document.createElement("button");
+        btn90.className = "small";
+        btn90.innerText = "+90";
+        btn90.onclick = () => addDays(realIndex, 90);
+        let btn365 = document.createElement("button");
+        btn365.className = "small";
+        btn365.innerText = "+1T";
+        btn365.onclick = () => addDays(realIndex, 365);
+        td4.append(inDate, btn30, btn90, btn365);
+
+        let td5 = document.createElement("td");
+        td5.style.textAlign = "center";
+        let inCheck = document.createElement("input");
+        inCheck.type = "checkbox";
+        inCheck.checked = m.allowOffline;
+        inCheck.onchange = () => { json[realIndex].allowOffline = inCheck.checked; markDirty(); };
+        td5.append(inCheck);
+
+        let td6 = document.createElement("td");
+        let btnDel = document.createElement("button");
+        btnDel.className = "delete";
+        btnDel.innerText = "X";
+        btnDel.onclick = () => hapusById(realIndex);
+        td6.append(btnDel);
+
+        tr.append(td1, td2, td3, td4, td5, td6);
+        tb.appendChild(tr);
+    });
+    updateStatistik();
+}
+
+function renderPagination(total) {
+    let pages = Math.ceil(total / pageSize);
+    let wrap = document.getElementById("pagination");
+    wrap.innerHTML = "";
+    if (pages <= 1) return;
+    for (let i = 1; i <= pages; i++) {
+        let btn = document.createElement("button");
+        btn.className = "secondary small";
+        btn.innerText = i;
+        if (i === currentPage) btn.style.background = "#000";
+        btn.onclick = () => { currentPage = i; refresh(); }
+        wrap.appendChild(btn);
+    }
+}
+
+function addDays(index, days) {
+    let d = json[index].expiresAt ? new Date(json[index].expiresAt + "T00:00:00") : new Date();
+    d.setDate(d.getDate() + days);
+    json[index].expiresAt = d.toISOString().split('T')[0];
+    markDirty();
+    refresh();
+}
+
+async function copyText(text) {
+    try {
+        if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+        } else {
+            const ta = document.createElement("textarea");
+            ta.value = text;
+            ta.style.position = "fixed";
+            ta.style.left = "-9999px";
+            document.body.appendChild(ta);
+            ta.focus();
+            ta.select();
+            document.execCommand("copy");
+            document.body.removeChild(ta);
+        }
+        setStatus("✅ ID disalin: " + text, "success");
+    } catch (e) {
+        alert("Gagal copy: " + e.message);
+    }
+}
+
+function copyAllData() {
+    navigator.clipboard.writeText(JSON.stringify(json, null, 2))
+        .then(() => setStatus("✅ Semua data disalin ke clipboard", "success"))
+        .catch(() => alert("Clipboard tidak didukung browser."));
+}
+
+function togglePass(i) {
+    const el = document.getElementById("pass-" + i);
+    el.type = el.type === "password" ? "text" : "password";
+}
+
+function sortBy(field) {
+    json.sort((a, b) => {
+        if (field === "username") return (a.username || "").localeCompare(b.username || "");
+        if (field === "expiresAt") return (a.expiresAt || "").localeCompare(b.expiresAt || "");
+        return (a.id || "").localeCompare(b.id || "");
+    });
+    pushHistory();
+    refresh();
+}
+
+function hapusSemuaExpired() {
+    let today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let expiredData = json.filter(m => m.expiresAt && new Date(m.expiresAt + "T00:00:00") < today);
+    if (expiredData.length === 0) { alert("Tidak ada member yang expired."); return; }
+    if (!confirm(`Hapus ${expiredData.length} member yang sudah expired?`)) { return; }
+    json = json.filter(m => !m.expiresAt || new Date(m.expiresAt + "T00:00:00") >= today);
+    markDirty();
+    refresh();
+    setStatus(`Selesai! ${expiredData.length} member expired dihapus`, "success");
+}
+
+function hapusById(i) {
+    if (!confirm("Hapus member ini?")) return;
+    json.splice(i, 1);
+    markDirty();
+    refresh();
+}
+
+function addRow() {
+    let d = new Date();
+    d.setFullYear(d.getFullYear() + 1);
+    json.push({ id: "", username: "", password: "", expiresAt: d.toISOString().split("T")[0], allowOffline: true });
+    markDirty();
+    refresh();
+}
+
+function updateStatistik() {
+    let total = json.length;
+    let expCount = 0;
+    let expiringCount = 0;
+    let offCount = 0;
+    let activeCount = 0;
+    let today = new Date();
+    today.setHours(0, 0, 0, 0);
+    json.forEach(m => {
+        if (m.allowOffline) offCount++;
+        if (m.expiresAt) {
+            let expDate = new Date(m.expiresAt + "T00:00:00");
+            let diffDays = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+            if (diffDays < 0) expCount++; else if (diffDays <= 7) expiringCount++; else activeCount++;
+        } else { activeCount++; }
+    });
+    document.getElementById("stat-total").innerText = total;
+    document.getElementById("stat-active").innerText = activeCount;
+    document.getElementById("stat-expiring").innerText = expiringCount;
+    document.getElementById("stat-expired").innerText = expCount;
+    document.getElementById("stat-off").innerText = offCount;
+}
+
+function autoBackup() {
+    let backup = getFullState();
+    backup.mode = currentMode;
+    localStorage.setItem("tempkey_backup", JSON.stringify(backup));
+}
+
+function exportJSON() {
+    let blob = new Blob([JSON.stringify(json, null, 2)], { type: "application/json" });
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement("a");
+    a.href = url;
+    a.download = "CIMANGCU_VIP_" + new Date().toISOString().split('T')[0] + ".json";
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function validateJson() {
+    try {
+        if (currentMode === 'member') {
+            JSON.stringify(json);
+        } else {
+            JSON.stringify({
+                password: document.getElementById('globalPassword').value || globalPassword,
+                allowed_ids: allowedIds
+            });
+        }
+        alert("JSON VALID");
+    } catch (e) {
+        alert(e.message);
+    }
+}
+
+function importJSON(e) {
+    if (!confirm("Import akan mengganti seluruh data saat ini. Lanjutkan?")) return;
+    let file = e.target.files[0];
+    let reader = new FileReader();
+    reader.onload = function (evt) {
+        try {
+            let parsed = JSON.parse(evt.target.result);
+            if (Array.isArray(parsed)) {
+                if (!parsed.every(x => typeof x === "object" && x !== null)) {
+                    throw new Error("Format member salah: setiap item harus berupa object");
+                }
+                originalFormat = 'array';
+                json = parsed;
+                setMode('member');
+                pushHistory();
+                refresh();
+                markDirty();
+                setStatus("Import berhasil: " + json.length + " data", "success");
+            } else if (parsed && typeof parsed === 'object') {
+                originalFormat = 'object';
+                json = [];
+                allowedIds = Array.isArray(parsed.allowed_ids) ? parsed.allowed_ids : [];
+                globalPassword = parsed.password || "cimangcuvip";
+                document.getElementById('globalPassword').value = globalPassword;
+                setMode('allowed');
+                renderAllowedIds();
+                markDirty();
+                setStatus("Import berhasil: " + allowedIds.length + " ID", "success");
+            } else {
+                throw new Error("Format tidak dikenali");
+            }
+        } catch (err) {
+            setStatus("File JSON tidak valid: " + err.message, "error");
+        }
+        e.target.value = "";
+    }
+    reader.readAsText(file);
+}
+
+function renderAllowedIds() {
+    const list = document.getElementById('allowedList');
+    list.innerHTML = '';
+    allowedIds.forEach((v, i) => {
+        let row = document.createElement('div');
+        row.className = 'id-row';
+
+        let input = document.createElement('input');
+        input.value = v;
+        input.placeholder = "ID...";
+        input.oninput = function() { updateAllowedId(i, this.value); };
+
+        let btn = document.createElement('button');
+        btn.innerText = 'X';
+        btn.onclick = function() { removeAllowedId(i); };
+
+        row.appendChild(input);
+        row.appendChild(btn);
+        list.appendChild(row);
+    });
+    document.getElementById('allowedCount').innerText = allowedIds.length;
+}
+
+function updateAllowedId(index, value) {
+    allowedIds[index] = value.trim();
+    markDirty();
+}
+
+function removeAllowedId(index) {
+    allowedIds.splice(index, 1);
+    markDirty();
+    renderAllowedIds();
+}
+
+function addAllowedId() {
+    allowedIds.push("");
+    markDirty();
+    renderAllowedIds();
+}
+
+function addAllowedIdFromInput() {
+    let input = document.getElementById("newAllowedId");
+    let v = input.value.trim();
+    if (!v) return;
+    if (allowedIds.includes(v)) {
+        alert("ID sudah ada");
+        return;
+    }
+    allowedIds.push(v);
+    input.value = "";
+    markDirty();
+    renderAllowedIds();
+}
+
+function sortAllowedIds() {
+    allowedIds.sort((a, b) => a.localeCompare(b));
+    markDirty();
+    renderAllowedIds();
+}
+
+function removeAllAllowedIds() {
+    if (!confirm("Hapus semua ID?")) return;
+    allowedIds = [];
+    markDirty();
+    renderAllowedIds();
+}
+
+function copyAllowedIds() {
+    navigator.clipboard.writeText(JSON.stringify(allowedIds, null, 2))
+        .then(() => setStatus("✅ Daftar ID disalin ke clipboard", "success"))
+        .catch(() => alert("Clipboard tidak didukung browser."));
+}
+
+function exportAllowedJSON() {
+    let payload = {
+        password: document.getElementById('globalPassword').value || globalPassword,
+        allowed_ids: allowedIds.filter(x => x.trim() !== "")
+    };
+    let blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement("a");
+    a.href = url;
+    a.download = "CIMANGCU_ALLOWED_" + new Date().toISOString().split('T')[0] + ".json";
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+window.onload = function () {
+    document.getElementById("token").value = localStorage.getItem("github_token") || "";
+    if (localStorage.getItem("darkmode") === "1") {
+        document.body.classList.add("dark");
+        document.getElementById("darkToggle").innerText = "☀️";
+    }
+    const backup = localStorage.getItem("tempkey_backup");
+    if (backup) {
+        if (confirm("Ditemukan backup lokal.\nPulihkan data yang belum disimpan?")) {
+            try {
+                let backupData = JSON.parse(backup);
+                if (backupData.mode === 'allowed') {
+                    currentMode = 'allowed';
+                    setFullState(backupData);
+                    setMode('allowed');
+                    renderAllowedIds();
+                    setStatus("⚠️ Data Allowed IDs dari backup dipulihkan", "success");
+                } else if (Array.isArray(backupData.members || backupData)) {
+                    json = Array.isArray(backupData) ? backupData : (backupData.members || []);
+                    setMode('member');
+                    pushHistory();
+                    refresh();
+                    setStatus("⚠️ Data Member dari backup dipulihkan", "success");
+                } else {
+                    throw new Error("Format backup tidak dikenali");
+                }
+                markDirty();
+            } catch (e) {
+                localStorage.removeItem("tempkey_backup");
+                setStatus("Backup corrupt. Dibuang.", "error");
+            }
+        }
+    }
+}
+window.onbeforeunload = function () {
+    if (dirty) {
+        return "Perubahan belum disimpan.";
+    }
+};
+</script>
+</body>
+</html>
