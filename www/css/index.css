@@ -1,0 +1,231 @@
+/* ==========================================
+   1. VARIABLE & THEME CONFIGURATION
+   ========================================== */
+:root {
+    --bg: #f8f9fa;
+    --card: #ffffff;
+    --text: #212529;
+    --border: #dee2e6;
+    --primary: #0d6efd;
+    --primary-hover: #0b5ed7;
+    --danger: #dc3545;
+    --secondary: #6c757d;
+    --shadow: rgba(0, 0, 0, 0.05);
+}
+
+body.dark {
+    --bg: #121212;
+    --card: #1e1e1e;
+    --text: #e0e0e0;
+    --border: #333333;
+    --primary: #3d8bfd;
+    --primary-hover: #2b78e4;
+    --shadow: rgba(0, 0, 0, 0.3);
+}
+
+/* ==========================================
+   2. BASE & LAYOUT STYLES
+   ========================================== */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 20px 15px;
+    background: var(--bg);
+    color: var(--text);
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+h2 {
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background: var(--border);
+    margin: 20px 0;
+}
+
+/* ==========================================
+   3. FORMS & INPUTS
+   ========================================== */
+input, button {
+    width: 100%;
+    padding: 12px;
+    margin: 6px 0;
+    font-size: 15px;
+    box-sizing: border-box;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--card);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s, background 0.3s, color 0.3s;
+}
+
+input:focus {
+    border-color: var(--primary);
+}
+
+button {
+    cursor: pointer;
+    background: var(--primary);
+    color: #ffffff;
+    font-weight: bold;
+    border: none;
+    transition: opacity 0.2s, background-color 0.2s;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+button.secondary {
+    background: var(--secondary);
+}
+
+button.danger {
+    background: var(--danger);
+}
+
+button.small {
+    width: auto;
+    padding: 8px 14px;
+    font-size: 14px;
+}
+
+/* ==========================================
+   4. COMPONENTS
+   ========================================== */
+
+/* Item List */
+.item {
+    display: flex;
+    gap: 6px;
+    margin: 6px 0;
+}
+
+.item input {
+    flex: 1;
+    margin: 0;
+}
+
+.item button {
+    width: 48px;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+/* Search Box */
+.search-box {
+    position: relative;
+}
+
+/* Stats Cards */
+.stats {
+    display: flex;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.stat-box {
+    background: var(--card);
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    flex: 1;
+    box-shadow: 0 2px 4px var(--shadow);
+}
+
+.stat-box h4 {
+    margin: 0;
+    font-size: 12px;
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-box p {
+    margin: 5px 0 0;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* Toolbar */
+.toolbar {
+    display: flex;
+    gap: 8px;
+    margin: 10px 0;
+    flex-wrap: wrap;
+}
+
+.toolbar button {
+    flex: 1;
+    min-width: 120px;
+}
+
+/* Status Notifications */
+.status {
+    margin: 10px 0;
+    padding: 12px 15px;
+    border-radius: 6px;
+    font-weight: 500;
+    display: none;
+}
+
+.status.show {
+    display: block;
+}
+
+.status.success {
+    background: #d1e7dd;
+    color: #0f5132;
+    border: 1px solid #badbcc;
+}
+
+.status.error {
+    background: #f8d7da;
+    color: #842029;
+    border: 1px solid #f5c2c7;
+}
+
+body.dark .status.success {
+    background: #0f5132;
+    color: #d1e7dd;
+    border-color: #146c43;
+}
+
+body.dark .status.error {
+    background: #842029;
+    color: #f8d7da;
+    border-color: #b02a37;
+}
+
+/* Dark Mode Toggle Floating Button */
+#darkToggle {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    font-size: 18px;
+    padding: 0;
+    z-index: 999;
+    box-shadow: 0 2px 8px var(--shadow);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 25px;
+    color: #888;
+    font-size: 14px;
+}
