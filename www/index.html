@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ID PASSWORD MEMBER CIMANGCU</title>
+
+<style>
+:root {
+    --bg: #f5f5f5;
+    --card: #ffffff;
+    --text: #111;
+    --border: #cccccc;
+    --primary: #000;
+    --danger: #cc0000;
+    --success: #2e7d32;
+}
+body.dark {
+    --bg: #0a0a0a;
+    --card: #1a1a1a;
+    --text: #eeeeee;
+    --border: #444;
+    --primary: #ffffff;
+}
+body {
+    font-family: Arial;
+    max-width: 700px;
+    margin: auto;
+    padding: 15px;
+    background: var(--bg);
+    color: var(--text);
+    transition: 0.3s;
+}
+input, button {
+    width: 100%;
+    padding: 12px;
+    margin: 6px 0;
+    font-size: 16px;
+    box-sizing: border-box;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--card);
+    color: var(--text);
+}
+button {
+    cursor: pointer;
+    background: var(--primary);
+    color: var(--bg);
+    font-weight: bold;
+    border: none;
+}
+button:hover { opacity: 0.85; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+button.secondary { background: #666; }
+button.danger { background: var(--danger); }
+button.small { width: auto; padding: 8px 14px; font-size: 14px; }
+.item {
+    display: flex;
+    margin: 5px 0;
+    align-items: center;
+}
+.item input {
+    flex: 1;
+    margin: 0;
+}
+.item button {
+    width: 70px;
+    margin-left: 5px;
+    margin: 0 0 0 5px;
+}
+.item .copy-btn {
+    width: 50px;
+    background: #555;
+}
+.search-box {
+    position: relative;
+}
+.search-box input {
+    padding-right: 80px;
+}
+.search-box .count {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    color: #888;
+}
+.highlight {
+    background: #ffeb3b !important;
+    color: #000 !important;
+    font-weight: bold;
+}
+body.dark .highlight {
+    background: #ff9800 !important;
+    color: #000 !important;
+}
+.stats {
+    display: flex;
+    gap: 10px;
+    margin: 10px 0;
+    flex-wrap: wrap;
+}
+.stat-box {
+    background: var(--card);
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    flex: 1;
+    min-width: 120px;
+}
+.stat-box h4 {
+    margin: 0;
+    font-size: 12px;
+    opacity: 0.7;
+}
+.stat-box p {
+    margin: 5px 0 0;
+    font-size: 20px;
+    font-weight: bold;
+}
+.toolbar {
+    display: flex;
+    gap: 8px;
+    margin: 10px 0;
+    flex-wrap: wrap;
+}
+.toolbar button {
+    flex: 1;
+    min-width: 120px;
+}
+.status {
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 6px;
+    font-weight: bold;
+    display: none;
+}
+.status.show { display: block; }
+.status.success { background: #c8e6c9; color: #1b5e20; }
+.status.error { background: #ffcdd2; color: #b71c1c; }
+body.dark .status.success { background: #1b5e20; color: #c8e6c9; }
+body.dark .status.error { background: #b71c1c; color: #ffcdd2; }
+#darkToggle {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    font-size: 20px;
+    padding: 0;
+    z-index: 999;
+}
+.empty-state {
+    text-align: center;
+    padding: 30px;
+    color: #888;
+    font-size: 14px;
+}
+</style>
+
+</head>
+<body>
+
+<button id="darkToggle" onclick="toggleDark()">🌙</button>
+
+<h2>GitHub JSON Editor</h2>
+
+<input id="token" type="password" placeholder="GitHub Token (ghp_xxx atau github_pat_xxx)">
+<input id="owner" value="yuwanaroy-cpu">
+<input id="repo" value="password">
+<input id="path" value="member.json">
+<input id="msg" value="Update member.json">
+
+<button onclick="loadJSON()">📥 Load dari GitHub</button>
+
+<div class="status" id="status"></div>
+
+<hr>
+
+<div class="stats">
+    <div class="stat-box">
+        <h4>Total ID</h4>
+        <p id="stat-total">0</p>
+    </div>
+    <div class="stat-box">
+        <h4>Tampil</h4>
+        <p id="stat-shown">0</p>
+    </div>
+</div>
+
+<div class="search-box">
+    <input id="search" type="text" placeholder="🔍 Cari ID..." onkeyup="render()">
+</div>
+
+<div class="toolbar">
+    <button class="secondary small" onclick="sortIDs()">A-Z Sort</button>
+    <button class="secondary small" onclick="removeDuplicates()">🧹 Hapus Duplikat</button>
+    <button class="danger small" onclick="clearAll()">🗑️ Hapus Semua</button>
+</div>
+
+<div id="list"></div>
+
+<div id="empty" class="empty-state" style="display:none;">
+    Tidak ada ID yang cocok dengan pencarian.
+</div>
+
+<input id="newid" placeholder="ID baru">
+
+<div class="toolbar">
+    <button onclick="addID()">➕ Tambah ID</button>
+    <button onclick="saveJSON()">💾 Save ke GitHub</button>
+</div>
+
+<script>
+
+let jsonData = {};
+let sha = "";
+let originalIds = [];
+
+function toggleDark() {
+    document.body.classList.toggle("dark");
+    localStorage.setItem("darkmode", document.body.classList.contains("dark") ? "1" : "0");
+    document.getElementById("darkToggle").innerText = document.body.classList.contains("dark") ? "☀️" : "🌙";
+}
+
+function setStatus(msg, type) {
+    const el = document.getElementById("status");
+    el.innerText = msg;
+    el.className = "status show " + type;
+    setTimeout(() => { el.className = "status"; }, 3000);
+}
+
+function getSearchTerm() {
+    return document.getElementById("search").value.toLowerCase().trim();
+}
+
+function getFilteredIds() {
+    const ids = jsonData.allowed_ids || [];
+    const term = getSearchTerm();
+    if (!term) return ids.map((v, i) => ({ value: v, index: i, originalIndex: i }));
+
+    const result = [];
+    ids.forEach((v, i) => {
+        if (v.toLowerCase().includes(term)) {
+            result.push({ value: v, index: i, originalIndex: i });
+        }
+    });
+    return result;
+}
+
+function render() {
+    const list = document.getElementById("list");
+    const empty = document.getElementById("empty");
+    const filtered = getFilteredIds();
+    const term = getSearchTerm();
+
+    document.getElementById("stat-total").innerText = (jsonData.allowed_ids || []).length;
+    document.getElementById("stat-shown").innerText = filtered.length;
+
+    if (filtered.length === 0 && (jsonData.allowed_ids || []).length > 0) {
+        empty.style.display = "block";
+        list.innerHTML = "";
+        return;
+    }
+    empty.style.display = "none";
+
+    let html = "";
+    filtered.forEach((item) => {
+        const v = item.value;
+        const i = item.index;
+
+        html += `
+        <div class="item" data-index="${i}">
+            <input value="${escapeHtml(v)}" onchange="updateID(${i}, this.value)">
+            <button class="copy-btn" onclick="copyID('${escapeHtml(v)}')">📋</button>
+            <button class="danger" onclick="hapus(${i})">X</button>
+        </div>
+        `;
+    });
+
+    list.innerHTML = html;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.innerText = text;
+    return div.innerHTML;
+}
+
+function updateID(index, newValue) {
+    if (!jsonData.allowed_ids) jsonData.allowed_ids = [];
+    jsonData.allowed_ids[index] = newValue.trim();
+    render();
+    setStatus("ID diperbarui", "success");
+}
+
+function hapus(i) {
+    if (!confirm("Hapus ID: " + jsonData.allowed_ids[i] + "?")) return;
+    jsonData.allowed_ids.splice(i, 1);
+    render();
+    setStatus("ID dihapus", "success");
+}
+
+function addID() {
+    const x = document.getElementById("newid").value.trim();
+    if (x === "") {
+        setStatus("ID tidak boleh kosong", "error");
+        return;
+    }
+    if (!jsonData.allowed_ids) jsonData.allowed_ids = [];
+    if (jsonData.allowed_ids.includes(x)) {
+        setStatus("ID sudah ada: " + x, "error");
+        return;
+    }
+    jsonData.allowed_ids.push(x);
+    document.getElementById("newid").value = "";
+    document.getElementById("search").value = "";
+    render();
+    setStatus("ID ditambahkan: " + x, "success");
+}
+
+function sortIDs() {
+    if (!jsonData.allowed_ids) return;
+    jsonData.allowed_ids.sort((a, b) => a.localeCompare(b));
+    render();
+    setStatus("ID diurutkan A-Z", "success");
+}
+
+function removeDuplicates() {
+    if (!jsonData.allowed_ids) return;
+    const before = jsonData.allowed_ids.length;
+    jsonData.allowed_ids = [...new Set(jsonData.allowed_ids)];
+    const after = jsonData.allowed_ids.length;
+    render();
+    setStatus("Duplikat dihapus: " + (before - after) + " item", "success");
+}
+
+function clearAll() {
+    if (!jsonData.allowed_ids || jsonData.allowed_ids.length === 0) return;
+    if (!confirm("Hapus semua " + jsonData.allowed_ids.length + " ID?")) return;
+    jsonData.allowed_ids = [];
+    render();
+    setStatus("Semua ID dihapus", "success");
+}
+
+async function copyID(text) {
+    try {
+        if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+        } else {
+            const ta = document.createElement("textarea");
+            ta.value = text;
+            ta.style.position = "fixed";
+            ta.style.left = "-9999px";
+            document.body.appendChild(ta);
+            ta.focus();
+            ta.select();
+            document.execCommand("copy");
+            document.body.removeChild(ta);
+        }
+        setStatus("📋 ID disalin: " + text, "success");
+    } catch (e) {
+        alert("Gagal copy: " + e.message);
+    }
+}
+
+async function loadJSON() {
+    const token = document.getElementById("token").value.trim();
+    const owner = document.getElementById("owner").value.trim();
+    const repo = document.getElementById("repo").value.trim();
+    const path = document.getElementById("path").value.trim();
+
+    if (!token) { setStatus("Token kosong", "error"); return; }
+
+    try {
+        const r = await fetch(
+            `https://api.github.com/repos/${owner}/${repo}/contents/${path}`,
+            {
+                headers: {
+                    Authorization: "Bearer " + token,
+                    Accept: "application/vnd.github+json"
+                }
+            }
+        );
+
+        if (r.status === 401) { setStatus("Token salah / tidak punya akses", "error"); return; }
+        if (r.status === 404) { setStatus("File tidak ditemukan", "error"); return; }
+        if (r.status === 403) { setStatus("Rate limit. Coba lagi nanti", "error"); return; }
+        if (!r.ok) { setStatus("Gagal load: HTTP " + r.status, "error"); return; }
+
+        const d = await r.json();
+        sha = d.sha;
+
+        // Decode base64 dengan UTF-8 support
+        const cleanContent = d.content.replace(/\s/g, "");
+        const bytes = Uint8Array.from(atob(cleanContent), c => c.charCodeAt(0));
+        const text = new TextDecoder().decode(bytes);
+
+        jsonData = JSON.parse(text);
+        originalIds = JSON.parse(JSON.stringify(jsonData.allowed_ids || []));
+
+        document.getElementById("search").value = "";
+        render();
+        setStatus("✅ Berhasil load " + (jsonData.allowed_ids || []).length + " ID", "success");
+        localStorage.setItem("github_token", token);
+    } catch (e) {
+        setStatus("❌ Error: " + e.message, "error");
+    }
+}
+
+async function saveJSON() {
+    const token = document.getElementById("token").value.trim();
+    const owner = document.getElementById("owner").value.trim();
+    const repo = document.getElementById("repo").value.trim();
+    const path = document.getElementById("path").value.trim();
+    const msg = document.getElementById("msg").value.trim();
+
+    if (!token) { setStatus("Token kosong", "error"); return; }
+    if (!sha) { setStatus("Load dulu sebelum save", "error"); return; }
+
+    // Bersihkan duplikat dan kosong sebelum save
+    const before = (jsonData.allowed_ids || []).length;
+    jsonData.allowed_ids = [...new Set(
+        (jsonData.allowed_ids || [])
+            .map(x => (x || "").trim())
+            .filter(x => x !== "")
+    )];
+
+    try {
+        // Encode ke base64 dengan UTF-8
+        const text = JSON.stringify(jsonData, null, 2);
+        const bytes = new TextEncoder().encode(text);
+        let binary = "";
+        bytes.forEach(b => binary += String.fromCharCode(b));
+        const content = btoa(binary);
+
+        const body = {
+            message: msg,
+            content: content,
+            sha: sha
+        };
+
+        const r = await fetch(
+            `https://api.github.com/repos/${owner}/${repo}/contents/${path}`,
+            {
+                method: "PUT",
+                headers: {
+                    Authorization: "Bearer " + token,
+                    Accept: "application/vnd.github+json",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(body)
+            }
+        );
+
+        if (r.ok) {
+            const result = await r.json();
+            sha = result.content.sha;
+            render();
+            setStatus("✅ Tersimpan! " + jsonData.allowed_ids.length + " ID", "success");
+        } else if (r.status === 409) {
+            setStatus("Konflik. Load ulang dulu.", "error");
+        } else if (r.status === 403) {
+            setStatus("Rate limit. Coba lagi nanti.", "error");
+        } else {
+            setStatus("Gagal save: HTTP " + r.status, "error");
+        }
+    } catch (e) {
+        setStatus("❌ Error: " + e.message, "error");
+    }
+}
+
+// Auto-load token dari localStorage
+window.onload = function() {
+    const savedToken = localStorage.getItem("github_token");
+    if (savedToken) document.getElementById("token").value = savedToken;
+
+    if (localStorage.getItem("darkmode") === "1") {
+        document.body.classList.add("dark");
+        document.getElementById("darkToggle").innerText = "☀️";
+    }
+};
+
+</script>
+
+</body>
+</html>
