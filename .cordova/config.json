@@ -1,0 +1,11 @@
+{
+  "lib": {
+    "www": {
+      "id": "www"
+    }
+  },
+  "platforms": [
+    "android"
+  ],
+  "plugins": {}
+}
